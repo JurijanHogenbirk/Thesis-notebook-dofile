@@ -1,0 +1,664 @@
+#In order to perform this analysis for the independent variable lying transportation costs, you have to replace 'gemiddelde_kosten_ziekenhuis' with 'gemiddelde_kosten_liggend'
+
+#Import packages
+import pandas as pd
+!pip install SyntheticControlMethods
+from SyntheticControlMethods import Synth, DiffSynth
+
+#install plot:
+import matplotlib.pyplot as plt
+
+pip install matplotlib
+
+import numpy as np
+
+pip install numpy
+
+import seaborn as sns
+
+pip install seaborn
+
+#Import data
+data = pd.read_csv("Final_Dataset.csv")
+
+data['gender'] = data['gender'].replace({'V': 1, 'M': 0})
+
+#visualize the amount of unique postal codes in the dataset
+num_postal_codes = len(data['postcode_3'].unique())
+print("Number of postal codes:", num_postal_codes)
+
+# Define the treatment postcodes 
+# For the RCT, you only include the postal codes 821, 822, 823
+postcode_treatment = [821, 822, 823, 824, 825, 830, 831, 832]
+
+# Define the years of interest
+years = range(2011, 2021)
+
+# Filter the dataset based on postcode values and years
+treatment_df = data[data['postcode_3'].isin(postcode_treatment) & data['jaar'].isin(years)]
+
+# Group by 'year' and calculate the average of 'gemiddelde_kosten_ziekenhuis'
+average_treatment_kosten = treatment_df.groupby('jaar')['gemiddelde_kosten_ziekenhuis'].mean().reset_index()
+
+# Print the average values
+print(average_treatment_kosten)
+
+# Group by 'year' and calculate the average of 'gemiddelde_kosten_ziekenhuis'
+average_treatment_age = treatment_df.groupby('jaar')['age'].mean().reset_index()
+
+# Group by 'year' and calculate the average of 'gemiddelde_kosten_ziekenhuis'
+average_treatment_gender = treatment_df.groupby('jaar')['gender'].mean().reset_index()
+
+# Print the average values
+print(average_treatment_age.age)
+print(average_treatment_gender.gender)
+
+#Here you create a new dataframe where you only have the data from your defned group and then calculate the average of everything
+data_treatment = {'jaar': years,
+        'gemiddelde_kosten_ziekenhuis': average_treatment_kosten.gemiddelde_kosten_ziekenhuis,
+        'id_code': ["treatment"]*10,
+        'age': average_treatment_age.age,
+        "gender": average_treatment_gender.gender
+                 } 
+
+data_treatment = pd.DataFrame(data_treatment)
+
+# Print the updated dataframe
+
+data_treatment.head()
+
+
+postcode_exclude = ["0", "821", "822", "823", "824", "825", "830", "831", "832", "389", "133", "132", "134", 
+                    "135", "131", "130", "136", "807", "808", "809", "384", "385", "386", "387", "388", "106", "111", "117"]
+
+# Create a new DataFrame by excluding rows with specified postcode_3 values
+new_data = data[~data['postcode_3'].isin(postcode_exclude)]
+
+# Display the new DataFrame
+print(new_data)
+
+average_age = new_data['age'].mean()
+average_costs = new_data['gemiddelde_kosten_ziekenhuis'].mean()
+
+# Display the results
+print("Average age:", average_age)
+print("Average gemiddelde_kosten_ziekenhuis:", average_costs)
+
+
+# Define the postcodes voor provincie utrecht
+postcode_utrecht = [340, 341, 342, 343, 344, 345, 346, 347, 348, 351, 352, 353, 354, 355, 356, 357, 358, 360, 361, 362, 363, 364, 370, 371, 372, 373, 374, 375, 376]
+treatment_year = (2018)
+
+# Filter the dataset based on postcode values and years
+utrecht_df = data[data['postcode_3'].isin(postcode_utrecht) & data['jaar'].isin(years)]
+
+# Group by 'year' and calculate the average of 'gemiddelde_kosten_ziekenhuis'
+average_utrecht_kosten = utrecht_df.groupby('jaar')['gemiddelde_kosten_ziekenhuis'].mean().reset_index()
+
+# Print the average values
+print(average_utrecht_kosten)
+
+# Group by 'year' and calculate the average of 'gemiddelde_kosten_ziekenhuis'
+average_utrecht_age = utrecht_df.groupby('jaar')['age'].mean().reset_index()
+
+# Group by 'year' and calculate the average of 'gemiddelde_kosten_ziekenhuis'
+average_utrecht_gender = utrecht_df.groupby('jaar')['gender'].mean().reset_index()
+
+# Print the average values
+print(average_utrecht_age.age)
+print(average_utrecht_gender.gender)
+
+#Here you create a new dataframe where you only have the data from your defined group and then calculate the average of everything
+data_utrecht = {'jaar': years,
+        'gemiddelde_kosten_ziekenhuis': average_utrecht_kosten.gemiddelde_kosten_ziekenhuis,
+        'id_code': ["utrecht_control"]*10,
+        'age': average_utrecht_age.age,
+        "gender": average_utrecht_gender.gender
+                 } 
+
+data_utrecht = pd.DataFrame(data_utrecht)
+
+# Print the updated dataframe
+
+data_utrecht.head()
+
+
+# Define the postcodes voor provincie Groningen
+postcode_groningen = [935, 936, 960, 961, 962, 963, 964, 965, 966, 967, 968, 969, 971, 972, 973, 974, 975, 976, 977, 978, 979, 980, 981, 982, 983, 984, 986, 988, 989, 990, 991, 993, 992, 994, 995, 996, 997, 998, 999, 950, 954, 955, 958, 959, 956
+]
+treatment_year = (2018)
+
+# Filter the dataset based on postcode values and years
+groningen_df = data[data['postcode_3'].isin(postcode_groningen) & data['jaar'].isin(years)]
+
+# Group by 'year' and calculate the average of 'gemiddelde_kosten_ziekenhuis'
+average_groningen_kosten = groningen_df.groupby('jaar')['gemiddelde_kosten_ziekenhuis'].mean().reset_index()
+
+# Print the average values
+print(average_groningen_kosten)
+
+# Group by 'year' and calculate the average of 'gemiddelde_kosten_ziekenhuis'
+average_groningen_age = groningen_df.groupby('jaar')['age'].mean().reset_index()
+
+# Group by 'year' and calculate the average of 'gemiddelde_kosten_ziekenhuis'
+average_groningen_gender = groningen_df.groupby('jaar')['gender'].mean().reset_index()
+
+# Print the average values
+print(average_groningen_age.age)
+print(average_groningen_gender.gender)
+
+#Here you create a new dataframe where you only have the data from your defined group and then calculate the average of everything
+data_groningen = {'jaar': years,
+        'gemiddelde_kosten_ziekenhuis': average_groningen_kosten.gemiddelde_kosten_ziekenhuis,
+        'id_code': ["groningen_control"]*10,
+        'age': average_groningen_age.age,
+        "gender": average_groningen_gender.gender
+                 } 
+
+data_groningen = pd.DataFrame(data_groningen)
+
+# Print the updated dataframe
+
+data_groningen.head()
+
+
+# Define the postcodes voor provincie friesland
+postcode_friesland = [840, 841, 842, 843, 844, 845, 846, 847, 848, 849, 850, 851, 852, 853, 855, 856, 857, 860, 861, 862, 863, 865, 870, 871, 872, 873, 874, 875, 880, 882, 883, 885, 886, 888, 889, 891, 892, 893, 894, 900, 901, 902, 903, 904, 905, 906, 907, 908, 910, 911, 912, 913, 914, 915, 916, 917, 920, 921, 922, 923, 924, 925, 926, 927, 928, 929, 930, 931, 932, 933, 934
+]
+treatment_year = (2018)
+
+# Filter the dataset based on postcode values and years
+friesland_df = data[data['postcode_3'].isin(postcode_friesland) & data['jaar'].isin(years)]
+
+# Group by 'year' and calculate the average of 'gemiddelde_kosten_ziekenhuis'
+average_friesland_kosten = friesland_df.groupby('jaar')['gemiddelde_kosten_ziekenhuis'].mean().reset_index()
+
+# Print the average values
+print(average_friesland_kosten)
+
+# Group by 'year' and calculate the average of 'gemiddelde_kosten_ziekenhuis'
+average_friesland_age = friesland_df.groupby('jaar')['age'].mean().reset_index()
+
+# Group by 'year' and calculate the average of 'gemiddelde_kosten_ziekenhuis'
+average_friesland_gender = friesland_df.groupby('jaar')['gender'].mean().reset_index()
+
+# Print the average values
+print(average_friesland_age.age)
+print(average_friesland_gender.gender)
+
+#Here you create a new dataframe where you only have the data from your defined group and then calculate the average of everything
+data_friesland = {'jaar': years,
+        'gemiddelde_kosten_ziekenhuis': average_friesland_kosten.gemiddelde_kosten_ziekenhuis,
+        'id_code': ["friesland_control"]*10,
+                  'age': average_friesland_age.age,
+        "gender": average_friesland_gender.gender
+                 } 
+
+data_friesland = pd.DataFrame(data_friesland)
+
+# Print the updated dataframe
+
+data_friesland.head()
+
+
+# Define the postcodes voor provincie drenthe
+postcode_drenthe = [791, 792, 793, 794, 795, 796, 797, 798, 799, 941, 942, 943, 944, 945, 946, 947, 948, 949,  951, 952, 953, 957]
+treatment_year = (2018)
+
+# Filter the dataset based on postcode values and years
+drenthe_df = data[data['postcode_3'].isin(postcode_drenthe) & data['jaar'].isin(years)]
+
+# Group by 'year' and calculate the average of 'gemiddelde_kosten_ziekenhuis'
+average_drenthe_kosten = drenthe_df.groupby('jaar')['gemiddelde_kosten_ziekenhuis'].mean().reset_index()
+
+# Print the average values
+print(average_drenthe_kosten)
+
+# Group by 'year' and calculate the average of 'gemiddelde_kosten_ziekenhuis'
+average_drenthe_age = drenthe_df.groupby('jaar')['age'].mean().reset_index()
+
+# Group by 'year' and calculate the average of 'gemiddelde_kosten_ziekenhuis'
+average_drenthe_gender = drenthe_df.groupby('jaar')['gender'].mean().reset_index()
+
+# Print the average values
+print(average_drenthe_age.age)
+print(average_drenthe_gender.gender)
+
+#Here you create a new dataframe where you only have the data from your defined group and then calculate the average of everything
+data_drenthe = {'jaar': years,
+        'gemiddelde_kosten_ziekenhuis': average_drenthe_kosten.gemiddelde_kosten_ziekenhuis,
+        'id_code': ["drenthe_control"]*10,
+                'age': average_drenthe_age.age,
+        "gender": average_drenthe_gender.gender
+                 } 
+
+data_drenthe = pd.DataFrame(data_drenthe)
+
+# Print the updated dataframe
+
+data_drenthe.head()
+
+
+# Define the postcodes voor provincie overijssel
+postcode_overijssel = [741,  742, 743, 744, 745, 746, 747, 748, 749, 751, 752, 753, 754, 755, 756, 757, 758, 759, 761, 762, 763, 764, 765, 766, 767, 768, 769, 770, 771, 772, 773, 774, 775, 776, 777, 778, 779, 803, 804, 801, 806, 810, 811, 812, 813, 814, 815]
+treatment_year = (2018)
+
+# Filter the dataset based on postcode values and years
+overijssel_df = data[data['postcode_3'].isin(postcode_overijssel) & data['jaar'].isin(years)]
+
+# Group by 'year' and calculate the average of 'gemiddelde_kosten_ziekenhuis'
+average_overijssel_kosten = overijssel_df.groupby('jaar')['gemiddelde_kosten_ziekenhuis'].mean().reset_index()
+
+# Print the average values
+print(average_overijssel_kosten)
+
+# Group by 'year' and calculate the average of 'gemiddelde_kosten_ziekenhuis'
+average_overijssel_age = overijssel_df.groupby('jaar')['age'].mean().reset_index()
+
+# Group by 'year' and calculate the average of 'gemiddelde_kosten_ziekenhuis'
+average_overijssel_gender = overijssel_df.groupby('jaar')['gender'].mean().reset_index()
+
+# Print the average values
+print(average_overijssel_age.age)
+print(average_overijssel_gender.gender)
+
+#Here you create a new dataframe where you only have the data from your defined group and then calculate the average of everything
+data_overijssel = {'jaar': years,
+        'gemiddelde_kosten_ziekenhuis': average_overijssel_kosten.gemiddelde_kosten_ziekenhuis,
+        'id_code': ["overijssel_control"]*10,
+                   'age': average_overijssel_age.age,
+        "gender": average_overijssel_gender.gender
+                 } 
+
+data_overijssel = pd.DataFrame(data_overijssel)
+
+# Print the updated dataframe
+
+data_overijssel.head()
+
+# Define the postcodes voor provincie gelderland
+postcode_gelderland = [400, 401, 402, 403, 404, 405, 406, 410, 411, 412, 413, 414, 415, 416, 417, 418, 419, 660, 661, 662, 663, 664, 665, 666, 667, 668, 669, 670, 671, 672, 673, 674, 681, 682, 683, 684, 685, 686, 687, 688, 689, 690, 691, 692, 693, 694, 695, 696, 697, 698, 699, 700, 701, 702, 703, 704, 705, 706, 707, 708, 709, 710, 712, 713, 714, 715, 716, 720, 721, 722, 723, 724, 725, 726, 727, 731, 732, 733, 774, 735, 736, 737, 738, 739, 377, 378, 379,  384, 385, 386, 387, 388, 807, 808, 809, 810, 811, 812, 813, 814, 815, 816, 817, 818, 819, 530, 653, 658, 656, 651]
+treatment_year = (2018)
+
+# Filter the dataset based on postcode values and years
+gelderland_df = data[data['postcode_3'].isin(postcode_gelderland) & data['jaar'].isin(years)]
+
+# Group by 'year' and calculate the average of 'gemiddelde_kosten_ziekenhuis'
+average_gelderland_kosten = gelderland_df.groupby('jaar')['gemiddelde_kosten_ziekenhuis'].mean().reset_index()
+
+# Print the average values
+print(average_gelderland_kosten)
+
+# Group by 'year' and calculate the average of 'gemiddelde_kosten_ziekenhuis'
+average_gelderland_age = gelderland_df.groupby('jaar')['age'].mean().reset_index()
+
+# Group by 'year' and calculate the average of 'gemiddelde_kosten_ziekenhuis'
+average_gelderland_gender = gelderland_df.groupby('jaar')['gender'].mean().reset_index()
+
+# Print the average values
+print(average_gelderland_age.age)
+print(average_gelderland_gender.gender)
+
+#Here you create a new dataframe where you only have the data from your defined group and then calculate the average of everything
+data_gelderland = {'jaar': years,
+        'gemiddelde_kosten_ziekenhuis': average_gelderland_kosten.gemiddelde_kosten_ziekenhuis,
+        'id_code': ["gelderland_control"]*10,
+                   'age': average_gelderland_age.age,
+        "gender": average_gelderland_gender.gender
+                 } 
+
+data_gelderland = pd.DataFrame(data_gelderland)
+
+# Print the updated dataframe
+
+data_gelderland.head()
+
+
+# Define the postcodes voor provincie noordholland
+postcode_noordholland = [101, 102, 103, 105, 108, 109, 110, 112,  113, 114, 115, 116, 118, 119, 121, 122, 123, 124, 125, 126, 127, 140, 141, 142, 143, 144, 145, 146, 147, 148, 150, 151, 152, 153, 154, 155, 156, 160, 161, 162, 163, 164, 165, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 181, 182, 183, 184, 185, 186, 187, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199, 201, 202, 203, 204, 205, 206, 207, 208, 210, 211, 212, 213, 214, 215, 216, 217, 218, 219, 135, 138, 139]
+treatment_year = (2018)
+
+# Filter the dataset based on postcode values and years
+noordholland_df = data[data['postcode_3'].isin(postcode_noordholland) & data['jaar'].isin(years)]
+
+# Group by 'year' and calculate the average of 'gemiddelde_kosten_ziekenhuis'
+average_noordholland_kosten = noordholland_df.groupby('jaar')['gemiddelde_kosten_ziekenhuis'].mean().reset_index()
+
+# Print the average values
+print(average_noordholland_kosten)
+
+# Group by 'year' and calculate the average of 'gemiddelde_kosten_ziekenhuis'
+average_noordholland_age = noordholland_df.groupby('jaar')['age'].mean().reset_index()
+
+# Group by 'year' and calculate the average of 'gemiddelde_kosten_ziekenhuis'
+average_noordholland_gender = noordholland_df.groupby('jaar')['gender'].mean().reset_index()
+
+# Print the average values
+print(average_noordholland_age.age)
+print(average_noordholland_gender.gender)
+
+#Here you create a new dataframe where you only have the data from your defined group and then calculate the average of everything
+data_noordholland = {'jaar': years,
+        'gemiddelde_kosten_ziekenhuis': average_noordholland_kosten.gemiddelde_kosten_ziekenhuis,
+        'id_code': ["noordholland_control"]*10,
+                     'age': average_noordholland_age.age,
+        "gender": average_noordholland_gender.gender
+                 } 
+
+data_noordholland = pd.DataFrame(data_noordholland)
+
+# Print the updated dataframe
+
+data_noordholland.head()
+
+
+# Define the postcodes voor provincie zuidholland
+postcode_zuidholland = [220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 231, 232, 233, 234, 235, 236, 237, 238, 239, 240, 241, 242, 243, 244, 245, 246, 247, 248, 249, 251, 252, 253, 254, 255, 256, 257, 258, 259, 261, 262, 263, 264, 265, 266, 267, 268, 269, 271, 272, 273, 274, 275, 276, 277, 280, 281, 282, 283, 284, 285, 286, 287, 290, 291, 292, 293, 294, 295, 296, 297, 298, 299, 301, 302, 303, 304, 305, 306, 307, 308, 311, 312, 313, 314, 315, 316, 317, 318, 319, 320, 321, 322, 323, 324, 325, 326, 327, 328, 329, 331, 332, 333, 334, 335, 336, 337, 338]
+treatment_year = (2018)
+
+# Filter the dataset based on postcode values and years
+zuidholland_df = data[data['postcode_3'].isin(postcode_zuidholland) & data['jaar'].isin(years)]
+
+# Group by 'year' and calculate the average of 'gemiddelde_kosten_ziekenhuis'
+average_zuidholland_kosten = zuidholland_df.groupby('jaar')['gemiddelde_kosten_ziekenhuis'].mean().reset_index()
+
+# Print the average values
+print(average_zuidholland_kosten)
+
+# Group by 'year' and calculate the average of 'gemiddelde_kosten_ziekenhuis'
+average_zuidholland_age = zuidholland_df.groupby('jaar')['age'].mean().reset_index()
+
+# Group by 'year' and calculate the average of 'gemiddelde_kosten_ziekenhuis'
+average_zuidholland_gender = zuidholland_df.groupby('jaar')['gender'].mean().reset_index()
+
+# Print the average values
+print(average_zuidholland_age.age)
+print(average_zuidholland_gender.gender)
+
+#Here you create a new dataframe where you only have the data from your defined group and then calculate the average of everything
+data_zuidholland = {'jaar': years,
+        'gemiddelde_kosten_ziekenhuis': average_zuidholland_kosten.gemiddelde_kosten_ziekenhuis,
+        'id_code': ["zuidholland_control"]*10,
+                    'age': average_zuidholland_age.age,
+        "gender": average_zuidholland_gender.gender
+                 } 
+
+data_zuidholland = pd.DataFrame(data_zuidholland)
+
+# Print the updated dataframe
+
+data_zuidholland.head()
+
+
+# Define the postcodes voor provincie zeeland
+postcode_zeeland = [430, 431, 432, 433, 434, 435, 436, 437, 438, 440, 441, 442, 443, 444, 445, 446, 447, 448, 449, 450, 451, 452, 453, 454, 455, 456, 457, 458]
+# Filter the dataset based on postcode values and years
+zeeland_df = data[data['postcode_3'].isin(postcode_zeeland) & data['jaar'].isin(years)]
+treatment_year = (2018)
+
+# Group by 'year' and calculate the average of 'gemiddelde_kosten_ziekenhuis'
+average_zeeland_kosten = zeeland_df.groupby('jaar')['gemiddelde_kosten_ziekenhuis'].mean().reset_index()
+
+# Print the average values
+print(average_zeeland_kosten)
+
+# Group by 'year' and calculate the average of 'gemiddelde_kosten_ziekenhuis'
+average_zeeland_age = overijssel_df.groupby('jaar')['age'].mean().reset_index()
+
+# Group by 'year' and calculate the average of 'gemiddelde_kosten_ziekenhuis'
+average_zeeland_gender = zeeland_df.groupby('jaar')['gender'].mean().reset_index()
+
+# Print the average values
+print(average_zeeland_age.age)
+print(average_zeeland_gender.gender)
+
+#Here you create a new dataframe where you only have the data from your defined group and then calculate the average of everything
+data_zeeland = {'jaar': years,
+        'gemiddelde_kosten_ziekenhuis': average_zeeland_kosten.gemiddelde_kosten_ziekenhuis,
+        'id_code': ["zeeland_control"]*10,
+                'age': average_zeeland_age.age,
+        "gender": average_zeeland_gender.gender}
+
+data_zeeland = pd.DataFrame(data_zeeland)
+
+# Print the updated dataframe
+
+data_zeeland.head()
+
+
+# Define the postcodes voor provincie limburg
+postcode_limburg = [591, 592, 593, 594, 595, 596, 597, 598, 599, 600, 601, 602, 603, 604, 605, 606, 607, 608, 609, 610, 611, 612, 613, 614, 615, 616, 617, 618, 619, 621, 622, 623, 624, 625, 626, 627, 628, 629, 630, 632, 633, 634, 635, 636, 637, 641, 643, 644, 645, 646, 647, 652, 654, 655, 656, 657, 659, 581, 582, 583, 584, 585, 586, 587]
+# Filter the dataset based on postcode values and years
+limburg_df = data[data['postcode_3'].isin(postcode_limburg) & data['jaar'].isin(years)]
+treatment_year = (2018)
+
+# Group by 'year' and calculate the average of 'gemiddelde_kosten_ziekenhuis'
+average_limburg_kosten = limburg_df.groupby('jaar')['gemiddelde_kosten_ziekenhuis'].mean().reset_index()
+
+# Print the average values
+print(average_limburg_kosten)
+
+# Group by 'year' and calculate the average of 'gemiddelde_kosten_ziekenhuis'
+average_limburg_age = limburg_df.groupby('jaar')['age'].mean().reset_index()
+
+# Group by 'year' and calculate the average of 'gemiddelde_kosten_ziekenhuis'
+average_limburg_gender = limburg_df.groupby('jaar')['gender'].mean().reset_index()
+
+# Print the average values
+print(average_limburg_age.age)
+print(average_limburg_gender.gender)
+
+#Here you create a new dataframe where you only have the data from your defined group and then calculate the average of everything
+data_limburg = {'jaar': years,
+        'gemiddelde_kosten_ziekenhuis': average_limburg_kosten.gemiddelde_kosten_ziekenhuis,
+        'id_code': ["limburg_control"]*10,
+        'age': average_limburg_age.age,
+        "gender": average_limburg_gender.gender
+                 } 
+
+data_limburg = pd.DataFrame(data_limburg)
+
+# Print the updated dataframe
+
+data_limburg.head()
+
+
+# Define the postcodes voor provincie noordbrabant
+postcode_noordbrabant = [461, 462, 463, 464, 465, 466, 467, 468, 446, 470, 471, 472, 473, 474, 475, 476, 478, 479, 480, 481, 482, 483, 484, 485, 486, 487, 488, 489, 490, 492, 493, 494, 501, 502, 503, 504, 505, 506, 507, 508, 509, 510, 511, 512, 513, 514, 515, 516, 517, 521, 522, 523, 524, 525, 526, 527, 528, 529, 531, 532, 533, 534, 535, 536, 537, 538, 539, 540, 541, 542, 543, 544, 545, 546, 547, 548, 549, 550, 551, 552, 553, 554, 555, 556, 557, 558, 559, 561, 562, 563, 564, 565, 566, 567, 568, 569, 570, 571, 572, 573, 574, 575, 576, 420, 421, 422, 423, 424, 425, 426, 427, 428]
+# Filter the dataset based on postcode values and years
+noordbrabant_df = data[data['postcode_3'].isin(postcode_noordbrabant) & data['jaar'].isin(years)]
+treatment_year = (2018)
+
+# Group by 'year' and calculate the average of 'gemiddelde_kosten_ziekenhuis'
+average_noordbrabant_kosten = noordbrabant_df.groupby('jaar')['gemiddelde_kosten_ziekenhuis'].mean().reset_index()
+
+# Print the average values
+print(average_noordbrabant_kosten)
+
+# Group by 'year' and calculate the average of 'gemiddelde_kosten_ziekenhuis'
+average_noordbrabant_age = noordbrabant_df.groupby('jaar')['age'].mean().reset_index()
+
+# Group by 'year' and calculate the average of 'gemiddelde_kosten_ziekenhuis'
+average_noordbrabant_gender = noordbrabant_df.groupby('jaar')['gender'].mean().reset_index()
+
+# Print the average values
+print(average_noordbrabant_age.age)
+print(average_noordbrabant_gender.gender)
+
+#Here you create a new dataframe where you only have the data from your defined group and then calculate the average of everything
+data_noordbrabant = {'jaar': years,
+        'gemiddelde_kosten_ziekenhuis': average_noordbrabant_kosten.gemiddelde_kosten_ziekenhuis,
+        'id_code': ["noordbrabant_control"]*10,
+                     'age': average_noordbrabant_age.age,
+        "gender": average_noordbrabant_gender.gender
+                 } 
+
+data_noordbrabant = pd.DataFrame(data_noordbrabant)
+
+
+# Print the updated dataframe
+
+data_noordbrabant.head()
+
+#do this to get sorted data
+sorted_data = data_treatment.sort_values(by=['id_code', 'jaar'])
+
+# Here you add your created row for the treatment group to the data
+# for the robustness check for the control group you leave the provinces out that you intend to ommit
+combined_df = pd.concat([data_treatment, data_groningen, data_friesland, data_drenthe, data_overijssel,
+                        data_gelderland, data_limburg, data_utrecht, data_noordholland, data_zuidholland, data_zeeland, data_noordbrabant], ignore_index=True)
+
+# Print the combined dataframe
+print(combined_df)
+combined_df.head()
+
+#here we check if we have 10 rows in the treatment group
+print(combined_df['id_code'].value_counts()["treatment"])
+
+#here we check the data type per column
+print(combined_df['jaar'].dtype)
+print(combined_df['gemiddelde_kosten_ziekenhuis'].dtype)
+print(combined_df['id_code'].dtype)
+print(combined_df["age"].dtype)
+print(combined_df["gender"].dtype)
+
+#reshape the data into a wide format, with one column per province and one row per year.
+df = combined_df.pivot(index = 'jaar', columns = 'id_code', values='gemiddelde_kosten_ziekenhuis').reset_index()
+
+#plot the revenue over time for Miami and for the other cities.
+ids = [c for c in df.columns if c!='jaar']
+df['Other ids'] = df[[c for c in ids if c != 'treatment']].mean(axis=1)
+
+def plot_lines(df, line1, line2, jaar, hline=True):
+    sns.lineplot(x=df['jaar'], y=df[line1].values, label=line1)
+    sns.lineplot(x=df['jaar'], y=df[line2].values, label=line2)
+    plt.axvline(x=jaar, ls=":", color='C2', label='closure', zorder=1)
+    plt.legend();
+    plt.title("Average hospital expenditures");
+
+#define treatment year, for the placebo tests, you simply adjust this treatment year to 2014 or 2017
+treatment_year = 2018
+
+#use an appropriate color palette.
+sns.set_palette(sns.color_palette(['#f14db3', '#0dc3e2', '#443a84']))
+plot_lines(df, 'treatment', 'Other ids', treatment_year)
+
+#write a synth_predict function function that takes as input a model that is trained on control provinces and tries to predict the outcome of the MC Zuiderzee region, before the closure
+def synth_predict(df, model, id_code, jaar):
+    other_ids = [c for c in ids if c not in ['jaar', id_code]]
+    y = df.loc[df['jaar'] <= jaar, id_code]
+    X = df.loc[df['jaar'] <= jaar, other_ids]
+    df[f'Synthetic {id_code}'] = model.fit(X, y).predict(df[other_ids])
+    return model
+
+#Let’s estimate the model via linear regression.
+from sklearn.linear_model import LinearRegression
+coef = synth_predict(df, LinearRegression(), 'treatment', treatment_year).coef_
+
+#plotting the actual hospital expenditures/lying transportation costs in MC Zuiderzee region against the predicted one.
+plot_lines(df, 'treatment', 'Synthetic treatment', treatment_year)
+
+#plot the weights
+df_states = pd.DataFrame({'id_code': [c for c in ids if c!='treatment'], 'ols_coef': coef})
+plt.figure(figsize=(10, 9))
+sns.barplot(data=df_states, x='ols_coef', y='id_code');
+
+#write an objective function, I create a new class SyntheticControl() which has both a loss function, as described above, a method to fit it and predict the values for the treated unit.
+from toolz import partial
+from scipy.optimize import fmin_slsqp
+
+class SyntheticControl():
+    
+    # Loss function
+    def loss(self, W, X, y) -> float:
+        return np.sqrt(np.mean((y - X.dot(W))**2))
+
+    # Fit model
+    def fit(self, X, y):
+        w_start = [1/X.shape[1]]*X.shape[1]
+        self.coef_ = fmin_slsqp(partial(self.loss, X=X, y=y),
+                         np.array(w_start),
+                         f_eqcons=lambda x: np.sum(x) - 1,
+                         bounds=[(0.0, 1.0)]*len(w_start),
+                         disp=False)
+        self.mse = self.loss(W=self.coef_, X=X, y=y)
+        return self
+    
+    # Predict 
+    def predict(self, X):
+        return X.dot(self.coef_)
+
+def synth_predict(df, model, id_code, jaar):
+    other_ids = [c for c in ids if c not in ['jaar', id_code]]
+    y = df.loc[df['jaar'] <= jaar, id_code]
+    X = df.loc[df['jaar'] <= jaar, other_ids]
+    df[f'Synthetic {id_code}'] = model.fit(X, y).predict(df[other_ids])
+    return model
+
+from sklearn.linear_model import LinearRegression
+coef = synth_predict(df, LinearRegression(), 'treatment', treatment_year).coef_
+
+sns.set_palette(sns.color_palette(['#f14db3', '#0dc3e2', '#443a84']))
+plot_lines(df, 'treatment', 'Other ids', treatment_year)
+
+#repeat the same procedure as before but using the SyntheticControl method instead of the simple, unconstrained LinearRegression.
+df_states['coef_synth'] = synth_predict(df, SyntheticControl(), 'treatment', treatment_year).coef_
+
+plot_lines(df, 'treatment', 'Synthetic treatment', treatment_year)
+
+#let’s plot the difference between the two lines to better visualize the magnitude
+def plot_difference(df, id_code, jaar, vline=True, hline=True, **kwargs):
+    sns.lineplot(x=df['jaar'], y=df[id_code] - df[f'Synthetic {id_code}'], **kwargs)
+    if vline: 
+        plt.axvline(x=jaar, ls=":", color='C2', label='closure', lw=3, zorder=100)
+        plt.legend()
+    if hline: sns.lineplot(x=df['jaar'], y=0, lw=3, color='k', zorder=1)
+    plt.title("effect hospital expenditures");
+
+plot_difference(df, 'treatment', treatment_year)
+
+print(df)
+df.head()
+
+#Visualize the weights to interpret the estimated counterfactual 
+plt.figure(figsize=(10, 9))
+sns.barplot(data=df_states, x='coef_synth', y='id_code');
+
+#Replicate the procedure above, but for all other cities and compare them with the estimate for the MC Zuiderzee region.
+fig, ax = plt.subplots()
+for id_code in ids:
+    synth_predict(df, SyntheticControl(), id_code, treatment_year)
+    plot_difference(df, id_code, treatment_year, vline=False, alpha=0.2, color='C1', lw=3)
+plot_difference(df, 'treatment', treatment_year)
+
+#exclude states for which we cannot build a “good enough” counterfactual, in terms of pre-treatment MSE
+# Reference mse
+mse_treated = synth_predict(df, SyntheticControl(), 'treatment', treatment_year).mse
+
+# Other mse
+fig, ax = plt.subplots()
+for id_code in ids:
+    mse = synth_predict(df, SyntheticControl(), id_code, treatment_year).mse
+    if mse < 2 * mse_treated:
+        plot_difference(df, id_code, treatment_year, vline=False, alpha=0.2, color='C1', lw=3)
+plot_difference(df, 'treatment', treatment_year)
+
+#compute a p-value as the number of observations with a higher ratio.
+lambdas = {}
+for id_code in ids:
+    mse_pre = synth_predict(df, SyntheticControl(), id_code, treatment_year).mse
+    mse_tot = np.mean((df[f'Synthetic {id_code}'] - df[id_code])**2)
+    lambdas[id_code] = (mse_tot - mse_pre) / mse_pre
+    
+print(f"p-value: {np.mean(np.fromiter(lambdas.values(), dtype='float') > lambdas['treatment']):.4}")
+
+#Visualize the distribution of the statistic under permutation with a histogram.
+fig, ax = plt.subplots()
+_, bins, _ = plt.hist(lambdas.values(), bins=20, color="C1");
+plt.hist([lambdas['treatment']], bins=bins)
+plt.title('Ratio of $MSE_{post}$ and $MSE_{pre}$ across provinces');
+
+print(df)
+
+#weights berekenen age average hospital expenditures
+0.03*43.674224 + 0.02*44.06102 + 0.95*43.975383
