@@ -1,0 +1,254 @@
+clear
+
+use "/Users/jurijanhogenbirk/Library/CloudStorage/OneDrive-Persoonlijk/Erasmus Universiteit/Master Health economics/Thesis/DATA/postcode data/DATA/Data2011.dta"
+append using "/Users/jurijanhogenbirk/Library/CloudStorage/OneDrive-Persoonlijk/Erasmus Universiteit/Master Health economics/Thesis/DATA/postcode data/DATA/Data2012.dta" "/Users/jurijanhogenbirk/Library/CloudStorage/OneDrive-Persoonlijk/Erasmus Universiteit/Master Health economics/Thesis/DATA/postcode data/DATA/Data2013.dta" "/Users/jurijanhogenbirk/Library/CloudStorage/OneDrive-Persoonlijk/Erasmus Universiteit/Master Health economics/Thesis/DATA/postcode data/DATA/Data2014.dta" "/Users/jurijanhogenbirk/Library/CloudStorage/OneDrive-Persoonlijk/Erasmus Universiteit/Master Health economics/Thesis/DATA/postcode data/DATA/Data2015.dta" "/Users/jurijanhogenbirk/Library/CloudStorage/OneDrive-Persoonlijk/Erasmus Universiteit/Master Health economics/Thesis/DATA/postcode data/DATA/Data2016.dta" "/Users/jurijanhogenbirk/Library/CloudStorage/OneDrive-Persoonlijk/Erasmus Universiteit/Master Health economics/Thesis/DATA/postcode data/DATA/Data2017.dta" "/Users/jurijanhogenbirk/Library/CloudStorage/OneDrive-Persoonlijk/Erasmus Universiteit/Master Health economics/Thesis/DATA/postcode data/DATA/Data2018.dta" "/Users/jurijanhogenbirk/Library/CloudStorage/OneDrive-Persoonlijk/Erasmus Universiteit/Master Health economics/Thesis/DATA/postcode data/DATA/Data2019.dta" "/Users/jurijanhogenbirk/Library/CloudStorage/OneDrive-Persoonlijk/Erasmus Universiteit/Master Health economics/Thesis/DATA/postcode data/DATA/Data2020.dta"
+
+* destringe age 
+destring leeftijdsklasse, generate(age) force
+replace age=90 if age==. & postcode_3 !=.
+
+* destringe gender
+encode geslacht, generate(gender)
+recode gender 2=0
+replace gender= 2 if gender==0
+
+drop if age ==.
+
+*drop all unrelated variables, since dataset becomes to big
+drop kosten_huisarts_inschrijftarief
+drop kosten_tweedelijns_ggz
+drop kosten_huisarts_consult
+drop kosten_huisarts_overig
+drop kosten_hulpmiddelen
+drop kosten_mondzorg
+drop kosten_paramedische_zorg_fysioth
+drop kosten_paramedische_zorg_overig
+drop kosten_kraamzorg
+drop kosten_verloskundige_zorg
+drop kosten_eerstelijns_psychologisch
+drop kosten_grensoverschrijdende_zorg
+drop kosten_eerstelijns_ondersteuning
+drop kosten_overig
+drop kosten_geriatrische_revalidatiez
+drop kosten_specialistische_ggz
+drop kosten_generalistische_basis_ggz
+drop kosten_huisarts_mdz
+drop kosten_langdurige_ggz
+drop kosten_verpleging_en_verzorging
+drop kosten_eerstelijnsverblijf
+drop kosten_gzsp
+drop kosten_farmacie
+
+*Defining the treatment group = 821, 822, 823, 824, 825, 830, 831, 832 
+gen ijsselmeer=0
+replace ijsselmeer=1 if postcode_3==821
+replace ijsselmeer=1 if postcode_3==822
+replace ijsselmeer=1 if postcode_3==823 
+replace ijsselmeer=1 if postcode_3==824 
+replace ijsselmeer=1 if postcode_3==825 
+replace ijsselmeer=1 if postcode_3==830 
+replace ijsselmeer=1 if postcode_3==831 
+replace ijsselmeer=1 if postcode_3==832
+
+tab ijsselmeer
+*control group = all postcodes, excluding 821, 822, 823, 824, 825, 830, 831, 832 (treatment group),  389, 133, 132, 134, 135, 131, 130, 136 (region flevoland close to MC Zuiderzee), 826, 827, 829 (region overijssel close to MC Zuiderzee), 807, 808, 809, 384, 385, 386, 387, 388  (region gelderland close to MC Zuiderzee) 106, 111, 117 (Slotervaart region), also drop postcode 0
+
+drop if postcode_3 ==389 | postcode_3 ==133 | postcode_3 ==132 | postcode_3 ==134 | postcode_3 ==135 | postcode_3 ==131 | postcode_3 ==130 | postcode_3 ==136 | postcode_3 ==826 | postcode_3 ==827 | postcode_3 ==829 | postcode_3 ==807 | postcode_3 ==808 | postcode_3 ==809 | postcode_3 ==384 | postcode_3 ==385 | postcode_3 ==386 | postcode_3 ==387 | postcode_3 ==388 | postcode_3 ==106 | postcode_3 ==111 | postcode_3 ==117 | postcode_3 ==0
+
+* creating average costs
+generate gemiddelde_kosten_ziekenhuis = kosten_medisch_specialistische_z / aantal_bsn if postcode_3 !=.
+generate gemiddelde_kosten_liggend = kosten_ziekenvervoer_liggend / aantal_bsn if postcode_3 !=.
+generate gemiddelde_kosten_zittend = kosten_ziekenvervoer_zittend / aantal_bsn if postcode_3 !=.
+
+*id code bestaat uit gender, age and postal code 
+egen ids = concat(gender age postcode_3), p("")
+destring ids, generate(id_codes) force
+
+*Put data set into panel dataset
+bysort id_codes: gen npanel = _N
+tabulate npanel
+
+bysort id_codes: gen maxyears = _N
+keep if maxyears==10
+
+tab maxyears
+
+					***Till this point the dataset was exported to a csv file, and exported to Python***
+
+
+**Descriptive statistics - amount of individuals/people in the treatment group and the control group per year
+by jaar, sort : summarize ijsselmeer [fweight = aantal_bsn] if ijsselmeer ==1
+by jaar, sort : summarize ijsselmeer [fweight = aantal_bsn] if ijsselmeer==0
+
+**amount of unique groups
+by jaar, sort : summarize ijsselmeer if ijsselmeer ==1
+by jaar, sort : summarize ijsselmeer if ijsselmeer==0
+
+**Descriptive statistics - composition of age and gender in treatment and control group**
+
+** create age composition **
+tabulate age
+
+recode age (0/9 = 0 0_9yr) (10/19 = 1 10_19yr) (20/29=2 20_29yr) (30/39=3 30_39yr) (40/49=4 40_49yr) (50/59=5 50_59yr) (60/69=6 60_69yr) (70/79=7 70_79yr) (80/89=8 80_89yr) (90/max=9 90+) , gen(agegroup)
+tab agegroup
+
+***age composition***
+graph bar (percent) if ijsselmeer==1, over(agegroup, label(labsize(medium))) title("Composition of age treatment group") blabel(total, format(%3.1f)) saving(bar1, replace) 
+graph bar (percent) if ijsselmeer==0, over(agegroup, label(labsize(medium))) bar(1,fcolor(red)) title("Composition of age control group") blabel(total, format(%3.1f)) saving(bar2, replace)
+
+graph combine bar1.gph bar2.gph, row(2) col(1)
+
+***gender composition***
+graph bar, over(geslacht) over(ijsselmeer) over(jaar)  asyvars percentages title("Composition of gender") saving(bar3, replace)
+graph bar, over(geslacht) over(ijsselmeer) over(jaar)  asyvars percentages  title("Composition of gender") subtitle("Zoomed in version") ytitle("percentages") ylabels(48(0.5)51,labsize(small)) graphregion(margin(10 10 -1000 10)) saving(bar4, replace) 
+
+graph combine bar3.gph bar4.gph, row(2) col(1) 
+
+
+
+*						----ANALYSIS----			
+***Define D (ijsselmeer=1) & T (year_exposure)
+*T= is equal to 1 if the observation is after the closure has taken place and 0 otherwise
+*D= is 1 if unit is in treatment group; 0 if unit is control group 0--> use variable IJsselmeer
+						
+gen T = 0
+replace T = 1 if jaar >= 2018
+replace T = . if jaar == .
+
+*interactionterm gives us the treatment effect
+generate did = T * ijsselmeer
+
+						**hospital expenditures**
+didregress (gemiddelde_kosten_ziekenhuis i.jaar i.age i.gender) (did) [aweight = aantal_verzekerdejaren], group(postcode_3) time(jaar)
+estat ptrends
+
+**vizualizing parallel trends - unweighted
+bysort jaar ijsselmeer: egen mean_hospital_expenditures = mean(gemiddelde_kosten_ziekenhuis)
+twoway line mean_hospital_expenditures jaar if ijsselmeer == 0, sort || ///
+       line mean_hospital_expenditures jaar if ijsselmeer == 1, sort lpattern(dash) ///
+           legend(label(1 "Control group") label(2 "Treatment group")) ///
+           xline(2018)
+
+						**seated transportation costs**
+didregress (gemiddelde_kosten_zittend i.jaar i.age i.gender) (did) [aweight = aantal_verzekerdejaren], group(postcode_3) time(jaar)
+estat ptrends
+
+** vizualizing parallel trends - unweighted
+bysort jaar ijsselmeer: egen mean_seated_transportation_costs = mean(gemiddelde_kosten_zittend)
+twoway line mean_seated_transportation_costs jaar if ijsselmeer == 0, sort || ///
+       line mean_seated_transportation_costs jaar if ijsselmeer == 1, sort lpattern(dash) ///
+           legend(label(1 "Control group") label(2 "Treatment group")) ///
+           xline(2018)
+		   					
+						**lying transportation costs**
+didregress (gemiddelde_kosten_liggend i.jaar i.age i.gender) (did) [aweight = aantal_verzekerdejaren], group(postcode_3) time(jaar)
+estat ptrends
+
+** vizualizing parallel trends - unweighted 
+bysort jaar ijsselmeer: egen mean_lying_transportation_costs = mean(gemiddelde_kosten_liggend)
+twoway line mean_lying_transportation_costs jaar if ijsselmeer == 0, sort || ///
+       line mean_lying_transportation_costs jaar if ijsselmeer == 1, sort lpattern(dash) ///
+           legend(label(1 "Control group") label(2 "Treatment group")) ///
+           xline(2018)
+
+		   				** placebo test seated transportation costs: 
+**2014**
+gen T_placebo2014 = 0
+replace T_placebo2014 = 1 if jaar >= 2014
+replace T_placebo2014 = . if jaar == .
+
+*interactionterm gives us the treatment effect
+generate did_placebo_2014 = T_placebo2014 * ijsselmeer
+
+didregress (gemiddelde_kosten_zittend i.jaar i.age i.gender) (did_placebo_2014) [aweight = aantal_verzekerdejaren], group(postcode_3) time(jaar)
+estat ptrends
+
+**2017**
+gen T_placebo2017 = 0
+replace T_placebo2017 = 1 if jaar >= 2017
+replace T_placebo2017 = . if jaar == .
+
+*interactionterm gives us the treatment effect
+generate did_placebo_2017 = T_placebo2017 * ijsselmeer
+
+didregress (gemiddelde_kosten_zittend i.jaar i.age i.gender) (did_placebo_2017) [aweight = aantal_verzekerdejaren], group(postcode_3) time(jaar)
+estat ptrends
+
+						
+						**Robustness check treatment group***
+
+*original treatment group is 821, 822, 823, 824, 825, 830, 831, 832
+*reduce to 5 groups: 821, 822, 823, 824, 825
+gen ijsselmeer_check5=0
+replace ijsselmeer_check5 =1 if postcode_3==821
+replace ijsselmeer_check5 =1 if postcode_3==822
+replace ijsselmeer_check5 =1 if postcode_3==823 
+replace ijsselmeer_check5 =1 if postcode_3==824 
+replace ijsselmeer_check5 =1 if postcode_3==825 
+
+*interactionterm gives us the treatment effect
+generate did_robust5 = T * ijsselmeer_check5
+
+didregress (gemiddelde_kosten_zittend i.jaar i.age i.gender) (did_robust5) [aweight = aantal_verzekerdejaren], group(postcode_3) time(jaar)
+estat ptrends
+
+*reduce to 3 groups: 822, 823, 824
+gen ijsselmeer_check3=0
+replace ijsselmeer_check3 =1 if postcode_3==822
+replace ijsselmeer_check3 =1 if postcode_3==823 
+replace ijsselmeer_check3 =1 if postcode_3==824 
+
+*interactionterm gives us the treatment effect
+generate did_robust3 = T * ijsselmeer_check3
+
+didregress (gemiddelde_kosten_zittend i.jaar i.age i.gender) (did_robust3) [aweight = aantal_verzekerdejaren], group(postcode_3) time(jaar)
+estat ptrends
+
+			
+					**Robustness check control group***
+					
+* how many postcodes in the control group -8 (treatment)
+egen num_unique_postcodes = group(postcode_3)
+tabulate num_unique_postcodes
+		
+sort postcode_3
+
+gen random_number = runiform(0, 100)
+bysort postcode_3: replace random_number = random_number[1]
+sort postcode_3
+
+	*reduce control group to 50%
+recode random_number (0/49 = 0) (50/100 = 1), generate(RCC50)
+tab RCC50
+drop if RCC50 == 0 & !inlist(postcode_3, 821, 822, 823, 824, 825, 830, 831, 832)
+
+*How many postal codes included
+egen num_unique_postcodes50 = group(postcode_3)
+tabulate num_unique_postcodes50
+
+didregress (gemiddelde_kosten_zittend i.jaar i.age i.gender) (did) [aweight = aantal_verzekerdejaren], group(postcode_3) time(jaar)
+estat ptrends
+
+	*reduce control group to 25%
+recode random_number (0/24 = 0) (25/100 = 1), generate(RCC25)
+tab RCC25
+drop if RCC25 == 1 & !inlist(postcode_3, 821, 822, 823, 824, 825, 830, 831, 832)
+
+*How many postal codes included
+egen num_unique_postcodes25 = group(postcode_3)
+tabulate num_unique_postcodes25
+
+didregress (gemiddelde_kosten_zittend i.jaar i.age i.gender) (did) [aweight = aantal_verzekerdejaren], group(postcode_3) time(jaar)
+estat ptrends
+
+	*reduce control group to 10%
+recode random_number (0/9 = 0) (10/100 = 1), generate(RCC10)
+tab RCC10
+drop if RCC10 == 1 & !inlist(postcode_3, 821, 822, 823, 824, 825, 830, 831, 832)
+
+*How many postal codes included:
+egen num_unique_postcodes10 = group(postcode_3)
+tabulate num_unique_postcodes10
+
+didregress (gemiddelde_kosten_zittend i.jaar i.age i.gender) (did) [aweight = aantal_verzekerdejaren], group(postcode_3) time(jaar)
+estat ptrends
