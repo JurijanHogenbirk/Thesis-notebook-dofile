@@ -23,7 +23,7 @@ data = pd.read_csv("Final_Dataset.csv")
 
 data['gender'] = data['gender'].replace({'V': 1, 'M': 0})
 
-#visualize the amount of unique postal codes in the dataset
+#visualize the amount of unique postal codes in the dataset + 31 (since postcodes were already dropped in the stata dofile)
 num_postal_codes = len(data['postcode_3'].unique())
 print("Number of postal codes:", num_postal_codes)
 
