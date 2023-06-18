@@ -84,10 +84,22 @@ average_costs = new_data['gemiddelde_kosten_ziekenhuis'].mean()
 print("Average age:", average_age)
 print("Average gemiddelde_kosten_ziekenhuis:", average_costs)
 
-#Calculate total individuals belonging to treatment group in the RCT
+#Calculate the average total of individuals belonging to treatment group in the RCT 2018-2020
 treatment_RCT = [822, 823, 824]
 data_for_bsn = data[(data['postcode_3'].isin(treatment_RCT)) & (data['jaar'] == 2018)] 
 sum_aantal_bsn = data_for_bsn['aantal_bsn'].sum()
+print("Sum of 'aantal_bsn' for the specified postcode_3 values:", sum_aantal_bsn)
+
+treatment_RCT = [822, 823, 824]
+data_for_bsn = data[(data['postcode_3'].isin(treatment_RCT)) & (data['jaar'] == 2019)] 
+sum_aantal_bsn = data_for_bsn['aantal_bsn'].sum()
+print("Sum of 'aantal_bsn' for the specified postcode_3 values:", sum_aantal_bsn)
+
+treatment_RCT = [822, 823, 824]
+data_for_bsn = data[(data['postcode_3'].isin(treatment_RCT)) & (data['jaar'] == 2020)] 
+sum_aantal_bsn = data_for_bsn['aantal_bsn'].sum()
+print("Sum of 'aantal_bsn' for the specified postcode_3 values:", sum_aantal_bsn)
+
 
 # Print the result
 print("Sum of 'aantal_bsn' for the specified postcode_3 values:", sum_aantal_bsn)
